@@ -46,26 +46,20 @@ class _AppState extends State<App> with WidgetsBindingObserver {
       home: LoginScreen(),
       onGenerateRoute: (settings) {
         String? name = settings.name;
-        Map<String, dynamic>? args =
-            settings.arguments as Map<String, dynamic>?;
+        Map<String, dynamic>? args = settings.arguments as Map<String, dynamic>?;
 
         MaterialPageRoute pageRout;
 
         switch (name) {
           case 'chat_dialog':
-            pageRout = MaterialPageRoute(
-                builder: (context) => ChatDialogScreen(
-                    args![USER_ARG_NAME], args[DIALOG_ARG_NAME]));
+            pageRout = MaterialPageRoute(builder: (context) => ChatDialogScreen(args![USER_ARG_NAME], args[DIALOG_ARG_NAME]));
             break;
           case 'chat_details':
-            pageRout = MaterialPageRoute(
-                builder: (context) => ChatDetailsScreen(
-                    args![USER_ARG_NAME], args[DIALOG_ARG_NAME]));
+            pageRout = MaterialPageRoute(builder: (context) => ChatDetailsScreen(args![USER_ARG_NAME], args[DIALOG_ARG_NAME]));
             break;
 
           case 'select_dialog':
-            pageRout = MaterialPageRoute<bool>(
-                builder: (context) => SelectDialogScreen(args![USER_ARG_NAME]));
+            pageRout = MaterialPageRoute<bool>(builder: (context) => SelectDialogScreen(args![USER_ARG_NAME]));
 
             break;
 
@@ -74,8 +68,7 @@ class _AppState extends State<App> with WidgetsBindingObserver {
             break;
 
           case 'settings':
-            pageRout = MaterialPageRoute(
-                builder: (context) => SettingsScreen(args![USER_ARG_NAME]));
+            pageRout = MaterialPageRoute(builder: (context) => SettingsScreen(args![USER_ARG_NAME]));
             break;
 
           default:
@@ -97,42 +90,35 @@ class _AppState extends State<App> with WidgetsBindingObserver {
   void initState() {
     super.initState();
 
-    init(config.APP_ID, config.AUTH_KEY, config.AUTH_SECRET,
-        onSessionRestore: () async {
+    init(config.APP_ID, config.AUTH_KEY, config.AUTH_SECRET, onSessionRestore: () async {
       SharedPrefs sharedPrefs = await SharedPrefs.instance.init();
       CubeUser? user = sharedPrefs.getUser();
 
       return createSession(user);
     });
 
-    connectivityStateSubscription =
-        Connectivity().onConnectivityChanged.listen((connectivityType) {
+    connectivityStateSubscription = Connectivity().onConnectivityChanged.listen((connectivityType) {
       if (AppLifecycleState.resumed != appState) return;
 
       if (connectivityType != ConnectivityResult.none) {
         log("chatConnectionState = ${CubeChatConnection.instance.chatConnectionState}");
-        bool isChatDisconnected =
-            CubeChatConnection.instance.chatConnectionState ==
-                    CubeChatConnectionState.Closed ||
-                CubeChatConnection.instance.chatConnectionState ==
-                    CubeChatConnectionState.ForceClosed;
+        bool isChatDisconnected = CubeChatConnection.instance.chatConnectionState == CubeChatConnectionState.Closed || CubeChatConnection.instance.chatConnectionState == CubeChatConnectionState.ForceClosed;
 
-        if (isChatDisconnected &&
-            CubeChatConnection.instance.currentUser != null) {
+        if (isChatDisconnected && CubeChatConnection.instance.currentUser != null) {
           CubeChatConnection.instance.relogin();
         }
       }
     });
 
-    appState = WidgetsBinding.instance!.lifecycleState;
-    WidgetsBinding.instance!.addObserver(this);
+    appState = WidgetsBinding.instance.lifecycleState;
+    WidgetsBinding.instance.addObserver(this);
   }
 
   @override
   void dispose() {
     connectivityStateSubscription.cancel();
 
-    WidgetsBinding.instance!.removeObserver(this);
+    WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
 

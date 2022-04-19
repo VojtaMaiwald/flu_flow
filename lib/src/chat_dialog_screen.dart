@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'package:chat_sample/src/utils/api_utils.dart';
+import '/src/utils/api_utils.dart';
 import 'package:flutter/foundation.dart';
 import 'package:universal_io/io.dart';
 
@@ -126,7 +126,7 @@ class ChatScreenState extends State<ChatScreen> {
     var uploadImageFuture = getUploadingImageFuture(result);
     var imageData;
 
-    if(kIsWeb){
+    if (kIsWeb) {
       imageData = result.files.single.bytes!;
     } else {
       imageData = File(result.files.single.path!).readAsBytesSync();
@@ -150,8 +150,7 @@ class ChatScreenState extends State<ChatScreen> {
 
   void onReceiveMessage(CubeMessage message) {
     log("onReceiveMessage message= $message");
-    if (message.dialogId != _cubeDialog.dialogId ||
-        message.senderId == _cubeUser.id) return;
+    if (message.dialogId != _cubeDialog.dialogId || message.senderId == _cubeUser.id) return;
 
     _cubeDialog.deliverMessage(message);
     addMessageToListView(message);
@@ -169,12 +168,8 @@ class ChatScreenState extends State<ChatScreen> {
 
   void onTypingMessage(TypingStatus status) {
     log("TypingStatus message= ${status.userId}");
-    if (status.userId == _cubeUser.id ||
-        (status.dialogId != null && status.dialogId != _cubeDialog.dialogId))
-      return;
-    userStatus = _occupants[status.userId]?.fullName ??
-        _occupants[status.userId]?.login ??
-        '';
+    if (status.userId == _cubeUser.id || (status.dialogId != null && status.dialogId != _cubeDialog.dialogId)) return;
+    userStatus = _occupants[status.userId]?.fullName ?? _occupants[status.userId]?.login ?? '';
     if (userStatus.isEmpty) return;
     userStatus = "$userStatus is typing ...";
 
@@ -232,24 +227,18 @@ class ChatScreenState extends State<ChatScreen> {
     await _cubeDialog.sendMessage(message);
     message.senderId = _cubeUser.id;
     addMessageToListView(message);
-    listScrollController.animateTo(0.0,
-        duration: Duration(milliseconds: 300), curve: Curves.easeOut);
+    listScrollController.animateTo(0.0, duration: Duration(milliseconds: 300), curve: Curves.easeOut);
   }
 
   updateReadDeliveredStatusMessage(MessageStatus status, bool isRead) {
     log('[updateReadDeliveredStatusMessage]');
     setState(() {
-      CubeMessage? msg = listMessage!.firstWhereOrNull(
-              (msg) => msg.messageId == status.messageId);
+      CubeMessage? msg = listMessage!.firstWhereOrNull((msg) => msg.messageId == status.messageId);
       if (msg == null) return;
       if (isRead)
-        msg.readIds == null
-            ? msg.readIds = [status.userId]
-            : msg.readIds?.add(status.userId);
+        msg.readIds == null ? msg.readIds = [status.userId] : msg.readIds?.add(status.userId);
       else
-        msg.deliveredIds == null
-            ? msg.deliveredIds = [status.userId]
-            : msg.deliveredIds?.add(status.userId);
+        msg.deliveredIds == null ? msg.deliveredIds = [status.userId] : msg.deliveredIds?.add(status.userId);
 
       log('[updateReadDeliveredStatusMessage] status updated for $msg');
     });
@@ -263,8 +252,7 @@ class ChatScreenState extends State<ChatScreen> {
       });
 
       if (existMessageIndex != -1) {
-        listMessage!
-            .replaceRange(existMessageIndex, existMessageIndex + 1, [message]);
+        listMessage!.replaceRange(existMessageIndex, existMessageIndex + 1, [message]);
       } else {
         listMessage!.insert(0, message);
       }
@@ -297,10 +285,8 @@ class ChatScreenState extends State<ChatScreen> {
 
   Widget buildItem(int index, CubeMessage message) {
     markAsReadIfNeed() {
-      var isOpponentMsgRead =
-          message.readIds != null && message.readIds!.contains(_cubeUser.id);
-      print(
-          "markAsReadIfNeed message= $message, isOpponentMsgRead= $isOpponentMsgRead");
+      var isOpponentMsgRead = message.readIds != null && message.readIds!.contains(_cubeUser.id);
+      print("markAsReadIfNeed message= $message, isOpponentMsgRead= $isOpponentMsgRead");
       if (message.senderId != _cubeUser.id && !isOpponentMsgRead) {
         if (message.readIds == null) {
           message.readIds = [_cubeUser.id!];
@@ -308,8 +294,7 @@ class ChatScreenState extends State<ChatScreen> {
           message.readIds!.add(_cubeUser.id!);
         }
 
-        if (CubeChatConnection.instance.chatConnectionState ==
-            CubeChatConnectionState.Ready) {
+        if (CubeChatConnection.instance.chatConnectionState == CubeChatConnectionState.Ready) {
           _cubeDialog.readMessage(message);
         } else {
           _unreadMessages.add(message);
@@ -321,20 +306,14 @@ class ChatScreenState extends State<ChatScreen> {
       log("[getReadDeliveredWidget]");
       bool messageIsRead() {
         log("[getReadDeliveredWidget] messageIsRead");
-        if (_cubeDialog.type == CubeDialogType.PRIVATE)
-          return message.readIds != null &&
-              (message.recipientId == null ||
-                  message.readIds!.contains(message.recipientId));
-        return message.readIds != null &&
-            message.readIds!.any((int id) => id != _cubeUser.id && _occupants.keys.contains(id));
+        if (_cubeDialog.type == CubeDialogType.PRIVATE) return message.readIds != null && (message.recipientId == null || message.readIds!.contains(message.recipientId));
+        return message.readIds != null && message.readIds!.any((int id) => id != _cubeUser.id && _occupants.keys.contains(id));
       }
 
       bool messageIsDelivered() {
         log("[getReadDeliveredWidget] messageIsDelivered");
-        if (_cubeDialog.type == CubeDialogType.PRIVATE)
-          return message.deliveredIds?.contains(message.recipientId) ?? false;
-        return message.deliveredIds != null &&
-            message.deliveredIds!.any((int id) => id != _cubeUser.id && _occupants.keys.contains(id));
+        if (_cubeDialog.type == CubeDialogType.PRIVATE) return message.deliveredIds?.contains(message.recipientId) ?? false;
+        return message.deliveredIds != null && message.deliveredIds!.any((int id) => id != _cubeUser.id && _occupants.keys.contains(id));
       }
 
       if (messageIsRead()) {
@@ -383,10 +362,8 @@ class ChatScreenState extends State<ChatScreen> {
 
     Widget getDateWidget() {
       return Text(
-        DateFormat('HH:mm').format(
-            DateTime.fromMillisecondsSinceEpoch(message.dateSent! * 1000)),
-        style: TextStyle(
-            color: greyColor, fontSize: 12.0, fontStyle: FontStyle.italic),
+        DateFormat('HH:mm').format(DateTime.fromMillisecondsSinceEpoch(message.dateSent! * 1000)),
+        style: TextStyle(color: greyColor, fontSize: 12.0, fontStyle: FontStyle.italic),
       );
     }
 
@@ -394,24 +371,20 @@ class ChatScreenState extends State<ChatScreen> {
       return Container(
         alignment: Alignment.center,
         child: Text(
-          DateFormat('dd MMMM').format(
-              DateTime.fromMillisecondsSinceEpoch(message.dateSent! * 1000)),
-          style: TextStyle(
-              color: primaryColor, fontSize: 20.0, fontStyle: FontStyle.italic),
+          DateFormat('dd MMMM').format(DateTime.fromMillisecondsSinceEpoch(message.dateSent! * 1000)),
+          style: TextStyle(color: primaryColor, fontSize: 20.0, fontStyle: FontStyle.italic),
         ),
         margin: EdgeInsets.all(10.0),
       );
     }
 
     bool isHeaderView() {
-      int headerId = int.parse(DateFormat('ddMMyyyy').format(
-          DateTime.fromMillisecondsSinceEpoch(message.dateSent! * 1000)));
+      int headerId = int.parse(DateFormat('ddMMyyyy').format(DateTime.fromMillisecondsSinceEpoch(message.dateSent! * 1000)));
       if (index >= listMessage!.length - 1) {
         return false;
       }
       var msgPrev = listMessage![index + 1];
-      int nextItemHeaderId = int.parse(DateFormat('ddMMyyyy').format(
-          DateTime.fromMillisecondsSinceEpoch(msgPrev.dateSent! * 1000)));
+      int nextItemHeaderId = int.parse(DateFormat('ddMMyyyy').format(DateTime.fromMillisecondsSinceEpoch(msgPrev.dateSent! * 1000)));
       var result = headerId != nextItemHeaderId;
       return result;
     }
@@ -428,83 +401,66 @@ class ChatScreenState extends State<ChatScreen> {
                   ? Container(
                       child: TextButton(
                         child: Material(
-                          child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.end,
-                              children: [
-                                CachedNetworkImage(
-                                  placeholder: (context, url) => Container(
-                                    child: CircularProgressIndicator(
-                                      valueColor: AlwaysStoppedAnimation<Color>(
-                                          themeColor),
-                                    ),
-                                    width: 200.0,
-                                    height: 200.0,
-                                    padding: EdgeInsets.all(70.0),
-                                    decoration: BoxDecoration(
-                                      color: greyColor2,
-                                      borderRadius: BorderRadius.all(
-                                        Radius.circular(8.0),
-                                      ),
-                                    ),
+                          child: Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
+                            CachedNetworkImage(
+                              placeholder: (context, url) => Container(
+                                child: CircularProgressIndicator(
+                                  valueColor: AlwaysStoppedAnimation<Color>(themeColor),
+                                ),
+                                width: 200.0,
+                                height: 200.0,
+                                padding: EdgeInsets.all(70.0),
+                                decoration: BoxDecoration(
+                                  color: greyColor2,
+                                  borderRadius: BorderRadius.all(
+                                    Radius.circular(8.0),
                                   ),
-                                  errorWidget: (context, url, error) =>
-                                      Material(
-                                    child: Image.asset(
-                                      'images/img_not_available.jpeg',
-                                      width: 200.0,
-                                      height: 200.0,
-                                      fit: BoxFit.cover,
-                                    ),
-                                    borderRadius: BorderRadius.all(
-                                      Radius.circular(8.0),
-                                    ),
-                                    clipBehavior: Clip.hardEdge,
-                                  ),
-                                  imageUrl: message.attachments!.first.url!,
+                                ),
+                              ),
+                              errorWidget: (context, url, error) => Material(
+                                child: Image.asset(
+                                  'images/img_not_available.jpeg',
                                   width: 200.0,
                                   height: 200.0,
                                   fit: BoxFit.cover,
                                 ),
-                                getDateWidget(),
-                                getReadDeliveredWidget(),
-                              ]),
+                                borderRadius: BorderRadius.all(
+                                  Radius.circular(8.0),
+                                ),
+                                clipBehavior: Clip.hardEdge,
+                              ),
+                              imageUrl: message.attachments!.first.url!,
+                              width: 200.0,
+                              height: 200.0,
+                              fit: BoxFit.cover,
+                            ),
+                            getDateWidget(),
+                            getReadDeliveredWidget(),
+                          ]),
                           borderRadius: BorderRadius.all(Radius.circular(8.0)),
                           clipBehavior: Clip.hardEdge,
                         ),
                         onPressed: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => FullPhoto(
-                                      url: message.attachments!.first.url!)));
+                          Navigator.push(context, MaterialPageRoute(builder: (context) => FullPhoto(url: message.attachments!.first.url!)));
                         },
                       ),
-                      margin: EdgeInsets.only(
-                          bottom: isLastMessageRight(index) ? 20.0 : 10.0,
-                          right: 10.0),
+                      margin: EdgeInsets.only(bottom: isLastMessageRight(index) ? 20.0 : 10.0, right: 10.0),
                     )
                   : message.body != null && message.body!.isNotEmpty
                       // Text
                       ? Flexible(
                           child: Container(
-                            padding:
-                                EdgeInsets.fromLTRB(15.0, 10.0, 15.0, 10.0),
-                            decoration: BoxDecoration(
-                                color: greyColor2,
-                                borderRadius: BorderRadius.circular(8.0)),
-                            margin: EdgeInsets.only(
-                                bottom: isLastMessageRight(index) ? 20.0 : 10.0,
-                                right: 10.0),
-                            child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.end,
-                                children: [
-                                  Text(
-                                    message.body!,
-                                    style: TextStyle(color: primaryColor),
-                                  ),
-                                  getDateWidget(),
-                                  getReadDeliveredWidget(),
-                                ]),
+                            padding: EdgeInsets.fromLTRB(15.0, 10.0, 15.0, 10.0),
+                            decoration: BoxDecoration(color: greyColor2, borderRadius: BorderRadius.circular(8.0)),
+                            margin: EdgeInsets.only(bottom: isLastMessageRight(index) ? 20.0 : 10.0, right: 10.0),
+                            child: Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
+                              Text(
+                                message.body!,
+                                style: TextStyle(color: primaryColor),
+                              ),
+                              getDateWidget(),
+                              getReadDeliveredWidget(),
+                            ]),
                           ),
                         )
                       : Container(
@@ -514,12 +470,8 @@ class ChatScreenState extends State<ChatScreen> {
                           ),
                           padding: EdgeInsets.fromLTRB(15.0, 10.0, 15.0, 10.0),
                           width: 200.0,
-                          decoration: BoxDecoration(
-                              color: greyColor2,
-                              borderRadius: BorderRadius.circular(8.0)),
-                          margin: EdgeInsets.only(
-                              bottom: isLastMessageRight(index) ? 20.0 : 10.0,
-                              right: 10.0),
+                          decoration: BoxDecoration(color: greyColor2, borderRadius: BorderRadius.circular(8.0)),
+                          margin: EdgeInsets.only(bottom: isLastMessageRight(index) ? 20.0 : 10.0, right: 10.0),
                         ),
             ],
             mainAxisAlignment: MainAxisAlignment.end,
@@ -537,20 +489,12 @@ class ChatScreenState extends State<ChatScreen> {
               children: <Widget>[
                 Material(
                   child: CircleAvatar(
-                    backgroundImage:
-                        _occupants[message.senderId]?.avatar != null &&
-                                _occupants[message.senderId]!.avatar!.isNotEmpty
-                            ? NetworkImage(_occupants[message.senderId]!.avatar!)
-                            : null,
+                    backgroundImage: _occupants[message.senderId]?.avatar != null && _occupants[message.senderId]!.avatar!.isNotEmpty ? NetworkImage(_occupants[message.senderId]!.avatar!) : null,
                     backgroundColor: greyColor2,
                     radius: 30,
                     child: getAvatarTextWidget(
-                      _occupants[message.senderId]?.avatar != null &&
-                          _occupants[message.senderId]!.avatar!.isNotEmpty,
-                      _occupants[message.senderId]
-                          ?.fullName
-                          ?.substring(0, 2)
-                          .toUpperCase(),
+                      _occupants[message.senderId]?.avatar != null && _occupants[message.senderId]!.avatar!.isNotEmpty,
+                      _occupants[message.senderId]?.fullName?.substring(0, 2).toUpperCase(),
                     ),
                   ),
                   borderRadius: BorderRadius.all(
@@ -562,56 +506,46 @@ class ChatScreenState extends State<ChatScreen> {
                     ? Container(
                         child: TextButton(
                           child: Material(
-                            child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  CachedNetworkImage(
-                                    placeholder: (context, url) => Container(
-                                      child: CircularProgressIndicator(
-                                        valueColor:
-                                            AlwaysStoppedAnimation<Color>(
-                                                themeColor),
-                                      ),
-                                      width: 200.0,
-                                      height: 200.0,
-                                      padding: EdgeInsets.all(70.0),
-                                      decoration: BoxDecoration(
-                                        color: greyColor2,
-                                        borderRadius: BorderRadius.all(
-                                          Radius.circular(8.0),
-                                        ),
-                                      ),
+                            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                              CachedNetworkImage(
+                                placeholder: (context, url) => Container(
+                                  child: CircularProgressIndicator(
+                                    valueColor: AlwaysStoppedAnimation<Color>(themeColor),
+                                  ),
+                                  width: 200.0,
+                                  height: 200.0,
+                                  padding: EdgeInsets.all(70.0),
+                                  decoration: BoxDecoration(
+                                    color: greyColor2,
+                                    borderRadius: BorderRadius.all(
+                                      Radius.circular(8.0),
                                     ),
-                                    errorWidget: (context, url, error) =>
-                                        Material(
-                                      child: Image.asset(
-                                        'images/img_not_available.jpeg',
-                                        width: 200.0,
-                                        height: 200.0,
-                                        fit: BoxFit.cover,
-                                      ),
-                                      borderRadius: BorderRadius.all(
-                                        Radius.circular(8.0),
-                                      ),
-                                      clipBehavior: Clip.hardEdge,
-                                    ),
-                                    imageUrl: message.attachments!.first.url!,
+                                  ),
+                                ),
+                                errorWidget: (context, url, error) => Material(
+                                  child: Image.asset(
+                                    'images/img_not_available.jpeg',
                                     width: 200.0,
                                     height: 200.0,
                                     fit: BoxFit.cover,
                                   ),
-                                  getDateWidget(),
-                                ]),
-                            borderRadius:
-                                BorderRadius.all(Radius.circular(8.0)),
+                                  borderRadius: BorderRadius.all(
+                                    Radius.circular(8.0),
+                                  ),
+                                  clipBehavior: Clip.hardEdge,
+                                ),
+                                imageUrl: message.attachments!.first.url!,
+                                width: 200.0,
+                                height: 200.0,
+                                fit: BoxFit.cover,
+                              ),
+                              getDateWidget(),
+                            ]),
+                            borderRadius: BorderRadius.all(Radius.circular(8.0)),
                             clipBehavior: Clip.hardEdge,
                           ),
                           onPressed: () {
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => FullPhoto(
-                                        url: message.attachments!.first.url!)));
+                            Navigator.push(context, MaterialPageRoute(builder: (context) => FullPhoto(url: message.attachments!.first.url!)));
                           },
                         ),
                         margin: EdgeInsets.only(left: 10.0),
@@ -619,21 +553,16 @@ class ChatScreenState extends State<ChatScreen> {
                     : message.body != null && message.body!.isNotEmpty
                         ? Flexible(
                             child: Container(
-                              padding:
-                                  EdgeInsets.fromLTRB(15.0, 10.0, 15.0, 10.0),
-                              decoration: BoxDecoration(
-                                  color: primaryColor,
-                                  borderRadius: BorderRadius.circular(8.0)),
+                              padding: EdgeInsets.fromLTRB(15.0, 10.0, 15.0, 10.0),
+                              decoration: BoxDecoration(color: primaryColor, borderRadius: BorderRadius.circular(8.0)),
                               margin: EdgeInsets.only(left: 10.0),
-                              child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      message.body!,
-                                      style: TextStyle(color: Colors.white),
-                                    ),
-                                    getDateWidget(),
-                                  ]),
+                              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                                Text(
+                                  message.body!,
+                                  style: TextStyle(color: Colors.white),
+                                ),
+                                getDateWidget(),
+                              ]),
                             ),
                           )
                         : Container(
@@ -641,15 +570,10 @@ class ChatScreenState extends State<ChatScreen> {
                               "Empty",
                               style: TextStyle(color: primaryColor),
                             ),
-                            padding:
-                                EdgeInsets.fromLTRB(15.0, 10.0, 15.0, 10.0),
+                            padding: EdgeInsets.fromLTRB(15.0, 10.0, 15.0, 10.0),
                             width: 200.0,
-                            decoration: BoxDecoration(
-                                color: greyColor2,
-                                borderRadius: BorderRadius.circular(8.0)),
-                            margin: EdgeInsets.only(
-                                bottom: isLastMessageRight(index) ? 20.0 : 10.0,
-                                right: 10.0),
+                            decoration: BoxDecoration(color: greyColor2, borderRadius: BorderRadius.circular(8.0)),
+                            margin: EdgeInsets.only(bottom: isLastMessageRight(index) ? 20.0 : 10.0, right: 10.0),
                           ),
               ],
             ),
@@ -662,10 +586,7 @@ class ChatScreenState extends State<ChatScreen> {
   }
 
   bool isLastMessageLeft(int index) {
-    if ((index > 0 &&
-            listMessage != null &&
-            listMessage![index - 1].id == _cubeUser.id) ||
-        index == 0) {
+    if ((index > 0 && listMessage != null && listMessage![index - 1].id == _cubeUser.id) || index == 0) {
       return true;
     } else {
       return false;
@@ -673,10 +594,7 @@ class ChatScreenState extends State<ChatScreen> {
   }
 
   bool isLastMessageRight(int index) {
-    if ((index > 0 &&
-            listMessage != null &&
-            listMessage![index - 1].id != _cubeUser.id) ||
-        index == 0) {
+    if ((index > 0 && listMessage != null && listMessage![index - 1].id != _cubeUser.id) || index == 0) {
       return true;
     } else {
       return false;
@@ -755,9 +673,7 @@ class ChatScreenState extends State<ChatScreen> {
       ),
       width: double.infinity,
       height: 50.0,
-      decoration: BoxDecoration(
-          border: Border(top: BorderSide(color: greyColor2, width: 0.5)),
-          color: Colors.white),
+      decoration: BoxDecoration(border: Border(top: BorderSide(color: greyColor2, width: 0.5)), color: Colors.white),
     );
   }
 
@@ -781,9 +697,7 @@ class ChatScreenState extends State<ChatScreen> {
         stream: getAllItems().asStream(),
         builder: (context, snapshot) {
           if (!snapshot.hasData) {
-            return Center(
-                child: CircularProgressIndicator(
-                    valueColor: AlwaysStoppedAnimation<Color>(themeColor)));
+            return Center(child: CircularProgressIndicator(valueColor: AlwaysStoppedAnimation<Color>(themeColor)));
           } else {
             listMessage = snapshot.data as List<CubeMessage>;
             return getWidgetMessages(listMessage);
@@ -799,13 +713,7 @@ class ChatScreenState extends State<ChatScreen> {
     var params = GetMessagesParameters();
     params.sorter = RequestSorter(SORT_DESC, '', 'date_sent');
     try {
-      await Future.wait<void>([
-        getMessages(_cubeDialog.dialogId!, params.getRequestParameters())
-            .then((result) => messages = result!.items),
-        getAllUsersByIds(_cubeDialog.occupantsIds!.toSet()).then((result) =>
-            _occupants.addAll(Map.fromIterable(result!.items,
-                key: (item) => item.id, value: (item) => item)))
-      ]);
+      await Future.wait<void>([getMessages(_cubeDialog.dialogId!, params.getRequestParameters()).then((result) => messages = result!.items), getAllUsersByIds(_cubeDialog.occupantsIds!.toSet()).then((result) => _occupants.addAll(Map.fromIterable(result!.items, key: (item) => item.id, value: (item) => item)))]);
       completer.complete(messages);
     } catch (error) {
       completer.completeError(error);
@@ -814,26 +722,16 @@ class ChatScreenState extends State<ChatScreen> {
   }
 
   Future<bool> onBackPress() {
-    Navigator.pushNamedAndRemoveUntil(
-        context, 'select_dialog', (r) => false,
-        arguments: {USER_ARG_NAME: _cubeUser});
+    Navigator.pushNamedAndRemoveUntil(context, 'select_dialog', (r) => false, arguments: {USER_ARG_NAME: _cubeUser});
 
     return Future.value(false);
   }
 
   _initChatListeners() {
-    msgSubscription = CubeChatConnection
-        .instance.chatMessagesManager!.chatMessagesStream
-        .listen(onReceiveMessage);
-    deliveredSubscription = CubeChatConnection
-        .instance.messagesStatusesManager!.deliveredStream
-        .listen(onDeliveredMessage);
-    readSubscription = CubeChatConnection
-        .instance.messagesStatusesManager!.readStream
-        .listen(onReadMessage);
-    typingSubscription = CubeChatConnection
-        .instance.typingStatusesManager!.isTypingStream
-        .listen(onTypingMessage);
+    msgSubscription = CubeChatConnection.instance.chatMessagesManager!.chatMessagesStream.listen(onReceiveMessage);
+    deliveredSubscription = CubeChatConnection.instance.messagesStatusesManager!.deliveredStream.listen(onDeliveredMessage);
+    readSubscription = CubeChatConnection.instance.messagesStatusesManager!.readStream.listen(onReadMessage);
+    typingSubscription = CubeChatConnection.instance.typingStatusesManager!.isTypingStream.listen(onTypingMessage);
   }
 
   void _initCubeChat() {
