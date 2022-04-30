@@ -7,6 +7,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:collection/collection.dart' show IterableExtension;
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
 
@@ -69,6 +70,7 @@ class ChatScreen extends StatefulWidget {
 }
 
 class ChatScreenState extends State<ChatScreen> {
+  static const platform = MethodChannel('com.mai0042.flu_flow/channel');
   final CubeUser _cubeUser;
   final CubeDialog _cubeDialog;
   final Map<int?, CubeUser?> _occupants = Map();
@@ -110,6 +112,19 @@ class ChatScreenState extends State<ChatScreen> {
     typingSubscription?.cancel();
     textEditingController.dispose();
     super.dispose();
+  }
+
+  Future<void> getEmoji() async {
+    String emoji = "";
+    try {
+      final String result = await platform.invokeMethod('getFaceRecognition');
+      emoji = result;
+    } on PlatformException catch (e) {
+      emoji = "PlatformException";
+    } on MissingPluginException catch (e) {
+      emoji = "MissingPluginException";
+    }
+    onSendChatMessage(emoji);
   }
 
   void openGallery() async {
@@ -628,15 +643,21 @@ class ChatScreenState extends State<ChatScreen> {
           // Button send image
           Material(
             child: Container(
-              margin: EdgeInsets.symmetric(horizontal: 1.0),
-              child: IconButton(
-                icon: Icon(Icons.image),
-                onPressed: () {
-                  openGallery();
-                },
-                color: primaryColor,
-              ),
-            ),
+                margin: EdgeInsets.symmetric(horizontal: 1.0),
+                child: Row(children: <Widget>[
+                  IconButton(
+                    icon: Icon(Icons.image),
+                    onPressed: () {
+                      openGallery();
+                    },
+                    color: primaryColor,
+                  ),
+                  IconButton(
+                      onPressed: () {
+                        getEmoji();
+                      },
+                      icon: Icon(Icons.face))
+                ])),
             color: Colors.white,
           ),
 
