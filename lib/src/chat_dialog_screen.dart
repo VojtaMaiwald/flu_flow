@@ -118,7 +118,7 @@ class ChatScreenState extends State<ChatScreen> {
     String emoji = "";
     try {
       final int result = await platform.invokeMethod('getFaceRecognition');
-      emoji = "$result";
+      emoji = "💀";
       switch (result) {
         case 0:
           emoji = "😮"; //surprise
@@ -142,15 +142,12 @@ class ChatScreenState extends State<ChatScreen> {
           emoji = "🤗"; //happy
           break;
         default:
-          emoji = "💀"; //null
           break;
       }
     } on PlatformException catch (e) {
       emoji = "PlatformException";
-      emoji = "💀"; //null
     } on MissingPluginException catch (e) {
       emoji = "MissingPluginException";
-      emoji = "💀"; //null
     }
     //onSendChatMessage(emoji); // does not work because when new activity is started user is logged out and this happens before logging in
     final updatedText = textEditingController.text + emoji;
