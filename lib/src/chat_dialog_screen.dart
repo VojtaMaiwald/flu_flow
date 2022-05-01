@@ -140,8 +140,7 @@ class ChatScreenState extends State<ChatScreen> {
         case 6:
           emoji = "🤗"; //happy
           break;
-        default:
-          break;
+        default: break;
       }
     } on PlatformException catch (e) {
       emoji = "PlatformException";
