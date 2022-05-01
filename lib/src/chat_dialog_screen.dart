@@ -117,14 +117,47 @@ class ChatScreenState extends State<ChatScreen> {
   Future<void> getEmoji() async {
     String emoji = "";
     try {
-      final String result = await platform.invokeMethod('getFaceRecognition');
-      emoji = result;
+      final int result = await platform.invokeMethod('getFaceRecognition');
+      emoji = "$result";
+      switch (result) {
+        case 0:
+          emoji = "😮"; //surprise
+          break;
+        case 1:
+          emoji = "😱"; //fear
+          break;
+        case 2:
+          emoji = "😠"; //angry
+          break;
+        case 3:
+          emoji = "😐"; //neutral
+          break;
+        case 4:
+          emoji = "😥"; //sad
+          break;
+        case 5:
+          emoji = "🤮"; //disgust
+          break;
+        case 6:
+          emoji = "🤗"; //happy
+          break;
+        default:
+          emoji = "💀"; //null
+          break;
+      }
     } on PlatformException catch (e) {
       emoji = "PlatformException";
+      emoji = "💀"; //null
     } on MissingPluginException catch (e) {
       emoji = "MissingPluginException";
+      emoji = "💀"; //null
     }
-    onSendChatMessage(emoji);
+    //onSendChatMessage(emoji); // does not work because when new activity is started user is logged out and this happens before logging in
+    final updatedText = textEditingController.text + emoji;
+    textEditingController.value = textEditingController.value.copyWith(
+      text: updatedText,
+      selection: TextSelection.collapsed(offset: updatedText.length),
+    );
   }
 
   void openGallery() async {

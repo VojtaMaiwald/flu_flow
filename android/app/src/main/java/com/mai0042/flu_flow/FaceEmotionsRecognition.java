@@ -35,6 +35,7 @@ public class FaceEmotionsRecognition {
     private int inputSize;
     private int height = 0;
     private int width = 0;
+    public int emotion = -1;
 
     private GpuDelegate gpuDelegate = null;
     private CascadeClassifier cascadeClassifier;
@@ -115,20 +116,34 @@ public class FaceEmotionsRecognition {
     private String getEmotionDescription(float emotion) {
         String retVal = "";
 
-        if (emotion >= 0.0f && emotion < 0.5f)
+        if (emotion >= 0.0f && emotion < 0.5f) {
             retVal = "Surprise";
-        else if (emotion >= 0.5f && emotion < 1.5f)
+            this.emotion = 0;
+        }
+        else if (emotion >= 0.5f && emotion < 1.5f) {
             retVal = "Fear";
-        else if (emotion >= 1.5f && emotion < 2.5f)
+            this.emotion = 1;
+        }
+        else if (emotion >= 1.5f && emotion < 2.5f) {
             retVal = "Angry";
-        else if (emotion >= 2.5f && emotion < 3.5f)
+            this.emotion = 2;
+        }
+        else if (emotion >= 2.5f && emotion < 3.5f) {
             retVal = "Neutral";
-        else if (emotion >= 3.5f && emotion < 4.5f)
+            this.emotion = 3;
+        }
+        else if (emotion >= 3.5f && emotion < 4.5f) {
             retVal = "Sad";
-        else if (emotion >= 4.5f && emotion < 5.5f)
+            this.emotion = 4;
+        }
+        else if (emotion >= 4.5f && emotion < 5.5f) {
             retVal = "Disgust";
-        else
+            this.emotion = 5;
+        }
+        else {
             retVal = "Happy";
+            this.emotion = 6;
+        }
 
         return  retVal;
     }

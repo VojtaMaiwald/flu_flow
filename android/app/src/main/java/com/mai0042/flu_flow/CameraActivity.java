@@ -5,9 +5,12 @@ import androidx.core.content.ContextCompat;
 
 import android.Manifest;
 import android.app.Activity;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.view.SurfaceView;
 import android.view.View;
@@ -99,6 +102,14 @@ public class CameraActivity extends Activity implements CameraBridgeViewBase.CvC
                 swapCamera();
             }
         });
+
+        new Handler(Looper.getMainLooper()).postDelayed(
+            () -> {
+                Intent returnIntent = new Intent();
+                returnIntent.putExtra("emojiIndex", (int)faceEmotionsRecognition.emotion);
+                setResult(Activity.RESULT_OK, returnIntent);
+                finish();
+            }, 10000);
     }
 
     @Override
