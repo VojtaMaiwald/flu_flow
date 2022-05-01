@@ -1,4 +1,5 @@
 package com.mai0042.flu_flow;
+
 import android.content.ContextWrapper;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -40,14 +41,14 @@ public class MainActivity extends FlutterActivity {
                         result.notImplemented();
                     }
 
-                    //Intent intent = new Intent(MainActivity.this, CameraActivity.class);
-                    //startActivity(intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP));
+                    Intent intent = new Intent(MainActivity.this, CameraActivity.class);
+                    startActivity(intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP));
                 }
         );
     }
     
     private String getFaceRecognition() {
-        Toast.makeText(this, "This is my Toast message!", Toast.LENGTH_LONG).show();
+        Toast.makeText(this, "Emoji sent", Toast.LENGTH_LONG).show();
         return ":D";
     }
 }
