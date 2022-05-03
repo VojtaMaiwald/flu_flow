@@ -87,6 +87,8 @@ public class FaceEmotionsRecognition {
         }
 
         Rect[] faceRectArray = faces.toArray();
+        if (faces.empty())
+            emotion = -1;
 
         for (Rect rect : faceRectArray) {
             Imgproc.rectangle(image, rect.tl(), rect.br(), new Scalar(0, 255, 0, 255), 2);

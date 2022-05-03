@@ -9,15 +9,14 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
 import android.util.Log;
 import android.view.SurfaceView;
-import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import org.opencv.android.BaseLoaderCallback;
 import org.opencv.android.CameraBridgeViewBase;
@@ -41,6 +40,7 @@ public class CameraActivity extends Activity implements CameraBridgeViewBase.CvC
     private Mat mGray;
     private CameraBridgeViewBase mOpenCvCameraView;
     private FaceEmotionsRecognition faceEmotionsRecognition = null;
+    private FloatingActionButton fab;
     private int mCameraIndex = 1;
     boolean openCvLoaded = false;
     private BaseLoaderCallback mLoaderCallback = new BaseLoaderCallback(this) {
@@ -96,20 +96,20 @@ public class CameraActivity extends Activity implements CameraBridgeViewBase.CvC
         fpsMeter = (TextView) findViewById(R.id.fpsMeter);
         fpsMeter.setTextColor(Color.WHITE);
 
-        ((Button) findViewById(R.id.swapCameraBtn)).setOnClickListener( new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                swapCamera();
-            }
-        });
+        findViewById(R.id.swapCameraBtn).setOnClickListener(v -> swapCamera());
 
-        new Handler(Looper.getMainLooper()).postDelayed(
-            () -> {
-                Intent returnIntent = new Intent();
-                returnIntent.putExtra("emojiIndex", (int)faceEmotionsRecognition.emotion);
-                setResult(Activity.RESULT_OK, returnIntent);
-                finish();
-            }, 10000);
+        findViewById(R.id.fab).setOnClickListener(v -> sendEmotionIntentToFlutter());
+    }
+
+    private void sendEmotionIntentToFlutter() {
+        if (faceEmotionsRecognition.emotion == -1) {
+            Toast.makeText(getApplicationContext(), "No face detected!", Toast.LENGTH_LONG).show();
+            return;
+        }
+        Intent returnIntent = new Intent();
+        returnIntent.putExtra("emojiIndex", faceEmotionsRecognition.emotion);
+        setResult(Activity.RESULT_OK, returnIntent);
+        finish();
     }
 
     @Override
